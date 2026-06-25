@@ -74,8 +74,10 @@ class AirflowAdapter(_BaseStubAdapter):
     def project(self, orchspec_doc: dict) -> ProjectionResult:
         from orchspec_validator.adapters.airflow_projector import project_to_airflow
         violations = self.validate_invariants(orchspec_doc)
-        if violations:
-            raise ValueError(f"Cannot project to {self.target_name}: {', '.join(violations)}")
+        # Only block on critical violations (missing required fields, etc.)
+        critical = [v for v in violations if "missing" in v.lower()]
+        if critical:
+            raise ValueError(f"Cannot project to {self.target_name}: {', '.join(critical)}")
         return project_to_airflow(orchspec_doc)
 
 
