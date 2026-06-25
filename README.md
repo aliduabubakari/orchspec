@@ -51,6 +51,8 @@ Natural Language / Code Description
 - [Python API](#python-api)
 - [Repository Layout](#repository-layout)
 - [Development](#development)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
 - [License](#license)
 
 ---
@@ -555,6 +557,19 @@ ruff check .
 # Type check
 mypy src
 ```
+
+## Contributing
+
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for:
+- Development setup and testing guidelines
+- How to add new orchestrator adapters
+- How to add semantic validation rules
+- How to extend the schema
+- Pull request process
+
+## Changelog
+
+See **[docs/changelog.md](docs/changelog.md)** for the full version history.
 
 ---
 
