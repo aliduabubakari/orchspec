@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "orchspec-validator"
-version = "1.0.0"
-description = "OrchSpec v1.0 compiler, validator, and semantic diff tools"
+name = "orchspec"
+version = "1.1.0"
+description = "Open Pipeline Orchestration Specification — compiler, validator, diff, and extensible multi-orchestrator adapter toolkit"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}

@@ -1,6 +1,12 @@
 # Changelog
 
-## 1.1.0 - 2026-03-08
+## 1.1.0 - 2026-06-25
+- Rebranded from OPOS to OrchSpec with full namespace migration
+- Renamed package to `orchspec` (PyPI)
+- Extensively documented schema extensibility patterns and adapter framework
+- 7 documented extension points: custom executors, categories, integrations, labels/tags, adapters, schema $ref overrides, OTS export
+
+## 1.0.0 (formerly OPOS v1.1.0) - 2026-03-08
 - Added strict PipeSpec profile schema and early compiler rejection (`COMP012`)
 - Added machine-readable mapping spec (`spec/mappings/pipespec_to_orchspec_v1.json`)
 - Expanded semantic validation with:
