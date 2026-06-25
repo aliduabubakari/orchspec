@@ -346,16 +346,22 @@ def _convert_component(
         )
 
     retry = comp.get("retry_policy") or {}
-    retry_policy = _omits_none(
-        {
-            "max_attempts": retry.get("max_attempts", 1),
-            "delay_seconds": retry.get("delay_seconds", 30),
-            "strategy": "exponential" if retry.get("exponential_backoff") else "constant",
-            "multiplier": retry.get("multiplier"),
-            "max_delay_seconds": retry.get("max_delay_seconds"),
-            "retry_on": retry.get("retry_on"),
-        }
-    )
+    max_attempts_raw = retry.get("max_attempts")
+    # max_attempts of 0 or missing = no retry — omit the entire retry block
+    if max_attempts_raw is not None and int(max_attempts_raw) <= 0:
+        retry_policy = {}
+    else:
+        max_attempts_val = max_attempts_raw if max_attempts_raw is not None else 1
+        retry_policy = _omits_none(
+            {
+                "max_attempts": max_attempts_val,
+                "delay_seconds": retry.get("delay_seconds", 30),
+                "strategy": "exponential" if retry.get("exponential_backoff") else "constant",
+                "multiplier": retry.get("multiplier"),
+                "max_delay_seconds": retry.get("max_delay_seconds"),
+                "retry_on": retry.get("retry_on"),
+            }
+        )
 
     upstream = comp.get("upstream_policy") or {}
 
