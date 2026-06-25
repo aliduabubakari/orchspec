@@ -1,6 +1,6 @@
 # Execution Modes
 
-OPOS v1.0 supports both imperative and declarative orchestration targets.
+OrchSpec v1.0 supports both imperative and declarative orchestration targets.
 
 Imperative examples:
 - Airflow
@@ -13,4 +13,4 @@ Declarative/container-native examples:
 - Kubeflow Pipelines
 - Flyte
 
-OPOS itself does not require OTS. `ots_export` is optional.
+OrchSpec itself does not require OTS. `ots_export` is optional.

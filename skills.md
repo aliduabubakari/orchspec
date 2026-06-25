@@ -1,12 +1,12 @@
 # OrchSpec v1 — LLM Skills Reference
 
-> **A self-contained guide for any LLM to generate valid OrchSpec (OPOS) v1 canonical pipeline documents.**
+> **A self-contained guide for any LLM to generate valid OrchSpec (OrchSpec) v1 canonical pipeline documents.**
 >
 > OrchSpec (the Orchestrator-Agnostic Canonical Specification) is a universal pipeline abstraction layer.
 > PipeSpec documents are deterministically compiled into OrchSpec, which can then be projected into
 > orchestrator-specific formats (Airflow, Prefect, Dagster, Kestra, Argo, KFP, Flyte).
 >
-> Use this reference to understand OrchSpec structure, produce valid `.opos.yaml` / `.opos.json` documents,
+> Use this reference to understand OrchSpec structure, produce valid `.orchspec.yaml` / `.orchspec.json` documents,
 > and reason about pipeline semantics at the canonical layer.
 
 ---
@@ -30,7 +30,7 @@ Key differences:
 
 | Aspect | PipeSpec | OrchSpec |
 |--------|----------|----------|
-| Identity | `pipespec_version: "1.0"` | `opos_version: "1.0"` |
+| Identity | `pipespec_version: "1.0"` | `orchspec_version: "1.0"` |
 | Pipeline name | `pipeline_summary.name` | `pipeline_id` (snake_case) + `metadata.name` |
 | Executor types | `python`, `http`, `docker` | `python_script`, `http_request`, `container` |
 | Parameter types | lowercase (`string`, `int`) | UPPERCASE (`STRING`, `INT`) |
@@ -46,7 +46,7 @@ A valid OrchSpec v1 document is a single JSON or YAML object with **6 required k
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `opos_version` | `string` | Must be `"1.0"` |
+| `orchspec_version` | `string` | Must be `"1.0"` |
 | `pipeline_id` | `string` | Unique pipeline identifier (snake_case, `^[a-z0-9][a-z0-9_-]*$`) |
 | `description` | `string` | Human-readable pipeline overview (1–4096 chars) |
 | `metadata` | `object` | Provenance, ownership, domain, complexity |
@@ -578,7 +578,7 @@ Used for both `request` and `limit`:
   "source_type": "step1_json",                  // optional. "step1_json" | "manual" | "migrated" | "template"
   "source_version": "1.0",                     // optional. string
   "generated_at": "2026-05-29T12:00:00Z",       // optional. ISO 8601 date-time
-  "generator_id": "pipespec2opos",             // optional. string
+  "generator_id": "pipespec2orchspec",             // optional. string
   "generator_version": "1.0.0",                // optional. string
   "original_name": "My ETL Pipeline"            // optional. string
 }
@@ -599,10 +599,10 @@ An arbitrary key-value store with no schema constraints (`additionalProperties: 
 
 ## 15. Complete Minimal Example
 
-Below is the smallest valid OrchSpec v1 document (YAML format, `.opos.yaml`):
+Below is the smallest valid OrchSpec v1 document (YAML format, `.orchspec.yaml`):
 
 ```yaml
-opos_version: '1.0'
+orchspec_version: '1.0'
 pipeline_id: simple_etl
 description: Extract CSV, transform, load to PostgreSQL
 metadata:
@@ -716,7 +716,7 @@ Equivalent minimal JSON form:
 
 ```json
 {
-  "opos_version": "1.0",
+  "orchspec_version": "1.0",
   "pipeline_id": "simple_etl",
   "description": "Extract CSV, transform, load to PostgreSQL",
   "metadata": {
@@ -765,7 +765,7 @@ Equivalent minimal JSON form:
 
 When generating an OrchSpec document (from PipeSpec or directly), verify:
 
-- [ ] `opos_version` is `"1.0"`
+- [ ] `orchspec_version` is `"1.0"`
 - [ ] `pipeline_id` is lowercase snake_case, matches pattern `^[a-z0-9][a-z0-9_-]*$`
 - [ ] `description` is non-empty, ≤ 4096 characters
 - [ ] `metadata` has all four required fields: `name`, `owner`, `domain`, `complexity`
@@ -839,22 +839,22 @@ If validation reveals errors, follow this repair loop:
 4. **Check determinism** — run `make golden-check` to ensure output matches canonical fixtures.
 5. **Re-validate** after each fix.
 
-For tooling: use `opos-validate` CLI or the Python API (`validate_opos`) to check conformance.
+For tooling: use `orchspec-validate` CLI or the Python API (`validate_orchspec`) to check conformance.
 
 ### Validation Commands
 
 ```bash
-# Validate an OPOS document
-opos-validate pipeline.opos.yaml
+# Validate an OrchSpec document
+orchspec-validate pipeline.orchspec.yaml
 
 # Validate with strict mode (SEM010 promoted to error)
-opos-validate pipeline.opos.yaml --strict
+orchspec-validate pipeline.orchspec.yaml --strict
 
 # Output JSON report
-opos-validate pipeline.opos.yaml --json-report
+orchspec-validate pipeline.orchspec.yaml --json-report
 
-# Diff two OPOS documents (semantic comparison)
-opos-diff old.opos.yaml new.opos.yaml --json-report
+# Diff two OrchSpec documents (semantic comparison)
+orchspec-diff old.orchspec.yaml new.orchspec.yaml --json-report
 ```
 
 ### Semantic Error Quick Reference

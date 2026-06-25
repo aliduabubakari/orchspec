@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://prompt2dag.dev/schemas/orchspec/v1.0/pipeline.schema.json",
+  "title": "Open Pipeline Orchestration Specification (OrchSpec) v1.0",
+  "type": "object",
+  "required": ["orchspec_version", "pipeline_id", "description", "metadata", "components", "flow"],
+  "additionalProperties": false,
+  "properties": {
+    "orchspec_version": {"type": "string", "enum": ["1.0"]},
+    "pipeline_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$", "minLength": 1, "maxLength": 128},
+    "description": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "metadata": {"$ref": "#/definitions/Metadata"},
+    "schedule": {"$ref": "#/definitions/Schedule"},
+    "parameters": {"type": "object", "additionalProperties": {"$ref": "#/definitions/Parameter"}},
+    "variables": {"type": "object", "additionalProperties": true},
+    "secrets": {"type": "array", "items": {"$ref": "#/definitions/SecretRef"}},
+    "integrations": {"type": "array", "items": {"$ref": "#/definitions/Integration"}},
+    "container_runtime": {"$ref": "#/definitions/ContainerRuntime"},
+    "components": {"type": "array", "minItems": 1, "items": {"$ref": "#/definitions/Component"}},
+    "flow": {"$ref": "#/definitions/Flow"},
+    "error_handling": {"$ref": "#/definitions/ErrorHandling"},
+    "observability": {"$ref": "#/definitions/Observability"},
+    "ots_export": {"$ref": "#/definitions/OTSExportConfig"},
+    "provenance": {"$ref": "#/definitions/Provenance"}
+  },
+  "definitions": {
+    "Metadata": {
+      "type": "object",
+      "required": ["name", "owner", "domain", "complexity"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "owner": {"type": "string"},
+        "domain": {"type": "string"},
+        "complexity": {"type": "string", "enum": ["low", "medium", "high"]},
+        "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+        "tags": {"type": "array", "items": {"type": "string"}},
+        "labels": {"type": "object", "additionalProperties": {"type": "string"}},
+        "created": {"type": "string", "format": "date"},
+        "updated": {"type": "string", "format": "date"},
+        "generator": {"type": "string", "enum": ["reference-manual", "template", "llm", "hybrid"]},
+        "llm_model": {"type": "string"},
+        "case_study": {"type": "string"}
+      }
+    },
+    "Schedule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "cron": {"type": "string"},
+        "timezone": {"type": "string"},
+        "start_date": {"type": "string", "format": "date-time"},
+        "end_date": {"type": "string", "format": "date-time"},
+        "catchup": {"type": "boolean"},
+        "max_active_runs": {"type": "integer", "minimum": 1}
+      }
+    },
+    "Parameter": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"type": "string", "enum": ["STRING", "INT", "FLOAT", "BOOLEAN", "DATETIME", "DATE", "FILE", "JSON", "ARRAY"]},
+        "default": {},
+        "description": {"type": "string"},
+        "required": {"type": "boolean"},
+        "constraints": {"type": "string"}
+      }
+    },
+    "SecretRef": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "required_by_component": {"type": "string"},
+        "env_var_fallback": {"type": "string"},
+        "sensitivity": {"type": "string", "enum": ["low", "medium", "high", "critical"]}
+      }
+    },
+    "Integration": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$"},
+        "name": {"type": "string"},
+        "type": {"type": "string", "enum": ["api", "database", "filesystem", "object_store", "message_queue", "smtp", "custom"]},
+        "protocol": {"type": "string"},
+        "base_url": {"type": "string"},
+        "host": {"type": "string"},
+        "port": {"type": "integer"},
+        "database": {"type": "string"},
+        "base_path": {"type": "string"},
+        "authentication": {
+          "type": "object",
+          "required": ["method"],
+          "additionalProperties": false,
+          "properties": {
+            "method": {"type": "string", "enum": ["none", "api_key", "basic", "bearer", "oauth2", "token"]},
+            "secret_ref": {"type": "string"},
+            "username_secret": {"type": "string"},
+            "password_secret": {"type": "string"}
+          }
+        },
+        "used_by_components": {"type": "array", "items": {"type": "string"}},
+        "direction": {"type": "string", "enum": ["input", "output", "both"]},
+        "rate_limit": {"type": "string", "pattern": "^\\d+/(second|minute|hour|day)$"}
+      }
+    },
+    "ContainerRuntime": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "default_image": {"type": "string"},
+        "image_pull_policy": {"type": "string", "enum": ["Always", "IfNotPresent", "Never"]},
+        "resource_defaults": {"type": "object", "additionalProperties": false, "properties": {"request": {"$ref": "#/definitions/ResourceSpec"}, "limit": {"$ref": "#/definitions/ResourceSpec"}}},
+        "security_context": {"$ref": "#/definitions/SecurityContext"},
+        "working_dir": {"type": "string"},
+        "volumes": {"type": "array", "items": {"$ref": "#/definitions/VolumeSpec"}}
+      }
+    },
+    "ResourceSpec": {"type": "object", "additionalProperties": false, "properties": {"cpu": {"type": "string"}, "memory": {"type": "string"}, "gpu": {"type": "integer", "minimum": 0}}},
+    "SecurityContext": {"type": "object", "additionalProperties": false, "properties": {"run_as_non_root": {"type": "boolean"}, "run_as_user": {"type": "integer", "minimum": 1}, "run_as_group": {"type": "integer", "minimum": 0}, "allow_privilege_escalation": {"type": "boolean"}, "read_only_root_filesystem": {"type": "boolean"}, "drop_capabilities": {"type": "array", "items": {"type": "string"}}, "add_capabilities": {"type": "array", "items": {"type": "string"}}}},
+    "VolumeSpec": {"type": "object", "required": ["name"], "additionalProperties": false, "properties": {"name": {"type": "string"}, "mount_path": {"type": "string"}, "size": {"type": "string"}, "access_mode": {"type": "string", "enum": ["ReadWriteOnce", "ReadOnlyMany", "ReadWriteMany"]}, "read_only": {"type": "boolean"}}},
+    "Component": {
+      "type": "object",
+      "required": ["id", "name", "category", "executor"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]*$"},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "category": {"type": "string", "enum": ["Extractor", "Transformer", "Loader", "Reconciliator", "QualityCheck", "Notifier", "Sensor", "Custom"]},
+        "executor": {"$ref": "#/definitions/Executor"},
+        "inputs": {"type": "array", "items": {"$ref": "#/definitions/IOSpec"}},
+        "outputs": {"type": "array", "items": {"$ref": "#/definitions/IOSpec"}},
+        "parameters": {"type": "object", "additionalProperties": true},
+        "env": {"type": "object", "additionalProperties": {"type": "string"}},
+        "resources": {"type": "object", "additionalProperties": false, "properties": {"request": {"$ref": "#/definitions/ResourceSpec"}, "limit": {"$ref": "#/definitions/ResourceSpec"}}},
+        "security_context": {"$ref": "#/definitions/SecurityContext"},
+        "retry": {"$ref": "#/definitions/RetryPolicy"},
+        "timeout": {"type": "string", "pattern": "^PT[0-9]+(H|M|S)$"},
+        "upstream_policy": {"type": "string", "enum": ["all_success", "all_done", "one_success", "none_failed", "always"]},
+        "script": {"type": "string"},
+        "script_language": {"type": "string", "enum": ["python", "bash", "sql", "r"]},
+        "image_override": {"type": "string"},
+        "integrations_used": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "Executor": {
+      "type": "object",
+      "required": ["type"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"type": "string", "enum": ["python_script", "container", "http_request", "sql", "email", "bash", "custom"]},
+        "image": {"type": "string"},
+        "python_callable": {"type": "string"},
+        "http_method": {"type": "string", "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"]},
+        "sql_connection_id": {"type": "string"},
+        "custom_class": {"type": "string"}
+      }
+    },
+    "IOSpec": {
+      "type": "object",
+      "required": ["name", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "direction": {"type": "string", "enum": ["input", "output"]},
+        "kind": {"type": "string", "enum": ["file", "table", "api", "object", "stream", "secret", "volume"]},
+        "format": {"type": "string", "enum": ["json", "csv", "parquet", "avro", "html", "sql", "text", "binary"]},
+        "path_pattern": {"type": "string"},
+        "integration_id": {"type": "string"},
+        "schema_ref": {"type": "string"},
+        "optional": {"type": "boolean"}
+      }
+    },
+    "RetryPolicy": {"type": "object", "required": ["max_attempts"], "additionalProperties": false, "properties": {"max_attempts": {"type": "integer", "minimum": 1, "maximum": 10}, "strategy": {"type": "string", "enum": ["constant", "exponential", "random"]}, "delay_seconds": {"type": "integer", "minimum": 0}, "max_delay_seconds": {"type": "integer"}, "multiplier": {"type": "number", "minimum": 1.0}, "retry_on": {"type": "array", "items": {"type": "string"}}}},
+    "Flow": {
+      "type": "object",
+      "required": ["pattern", "entry_points", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": {"type": "string", "enum": ["sequential", "parallel", "dag", "conditional", "loop"]},
+        "entry_points": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "edges": {"type": "array", "items": {"$ref": "#/definitions/Edge"}},
+        "parallelism_groups": {"type": "array", "items": {"type": "object", "required": ["id", "component_ids"], "additionalProperties": false, "properties": {"id": {"type": "string"}, "component_ids": {"type": "array", "items": {"type": "string"}}, "max_concurrent": {"type": "integer", "minimum": 1}}}}
+      }
+    },
+    "Edge": {"type": "object", "required": ["from", "to"], "additionalProperties": false, "properties": {"from": {"type": "string"}, "to": {"type": "string"}, "condition": {"type": "string"}, "edge_type": {"type": "string", "enum": ["success", "failure", "always"]}, "label": {"type": "string"}}},
+    "ErrorHandling": {"type": "object", "additionalProperties": false, "properties": {"on_failure": {"type": "string", "enum": ["fail_pipeline", "continue", "skip_dependents"]}, "notifications": {"type": "array", "items": {"type": "object", "additionalProperties": false, "properties": {"channel": {"type": "string", "enum": ["log", "email", "slack", "webhook", "pagerduty"]}, "level": {"type": "string", "enum": ["INFO", "WARN", "ERROR", "CRITICAL"]}, "message": {"type": "string"}, "recipients": {"type": "array", "items": {"type": "string"}}, "webhook_url": {"type": "string"}}}}}},
+    "Observability": {"type": "object", "additionalProperties": false, "properties": {"logging": {"type": "object", "properties": {"level": {"type": "string", "enum": ["DEBUG", "INFO", "WARNING", "ERROR"]}, "format": {"type": "string", "enum": ["json", "text"]}}}, "metrics": {"type": "object", "properties": {"enabled": {"type": "boolean"}, "standard": {"type": "array", "items": {"type": "string", "enum": ["pipeline_duration", "component_duration", "component_success_rate", "rows_processed", "bytes_processed"]}}}}, "lineage": {"type": "object", "properties": {"enabled": {"type": "boolean"}, "format": {"type": "string", "enum": ["openlineage", "datahub", "custom"]}, "export_endpoint": {"type": "string"}}}}},
+    "OTSExportConfig": {"type": "object", "additionalProperties": false, "properties": {"ots_version": {"type": "string"}, "module_id": {"type": "string"}, "component_mappings": {"type": "array", "items": {"type": "object", "required": ["component_id", "ots_type"], "additionalProperties": false, "properties": {"component_id": {"type": "string"}, "ots_type": {"type": "string", "enum": ["sql_transformation", "python_model", "external_source", "external_sink"]}, "ots_transformation_id": {"type": "string"}, "materialization": {"type": "string", "enum": ["table", "view", "incremental", "ephemeral"]}}}}}},
+    "Provenance": {"type": "object", "additionalProperties": false, "properties": {"source_file": {"type": "string"}, "source_type": {"type": "string", "enum": ["step1_json", "manual", "migrated", "template"]}, "source_version": {"type": "string"}, "generated_at": {"type": "string", "format": "date-time"}, "generator_id": {"type": "string"}, "generator_version": {"type": "string"}, "original_name": {"type": "string"}}}
+  }
+}

@@ -1,6 +1,6 @@
 # Compiler Guide
 
-This guide defines deterministic PipeSpec v1.0 to OPOS v1.0 mapping.
+This guide defines deterministic PipeSpec v1.0 to OrchSpec v1.0 mapping.
 
 ## Input Contract (Strict PipeSpec Profile)
 
@@ -13,7 +13,7 @@ If profile validation fails, compiler returns:
 ## Formal Mapping Spec
 
 Machine-readable mapping policy is stored at:
-- `spec/mappings/pipespec_to_opos_v1.json`
+- `spec/mappings/pipespec_to_orchspec_v1.json`
 
 The compiler reads this spec for:
 - executor type mapping
@@ -43,9 +43,9 @@ Executor mapping:
 - unknown -> `custom` (error in `--strict`)
 
 ## Normalization
-- Parameter types are normalized to OPOS enums (`float` -> `FLOAT`, etc).
+- Parameter types are normalized to OrchSpec enums (`float` -> `FLOAT`, etc).
 - Null/empty values are omitted from output unless required.
-- Retry policy maps to OPOS `retry` with deterministic defaults.
+- Retry policy maps to OrchSpec `retry` with deterministic defaults.
 
 ## Unsupported Input Policy
 - Strict mode (`--strict`) raises compile errors with stable IDs.

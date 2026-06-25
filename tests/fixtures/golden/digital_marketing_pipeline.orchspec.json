@@ -1,0 +1,125 @@
+{
+  "components": [
+    {
+      "category": "Extractor",
+      "executor": {
+        "type": "http_request"
+      },
+      "id": "fetch_campaigns",
+      "inputs": [],
+      "integrations_used": [
+        "ads_api"
+      ],
+      "name": "Fetch Campaigns",
+      "outputs": [],
+      "retry": {
+        "delay_seconds": 30,
+        "max_attempts": 2,
+        "strategy": "constant"
+      },
+      "upstream_policy": "all_success"
+    },
+    {
+      "category": "Transformer",
+      "executor": {
+        "type": "python_script"
+      },
+      "id": "transform_metrics",
+      "inputs": [],
+      "integrations_used": [
+        "warehouse"
+      ],
+      "name": "Transform",
+      "outputs": [],
+      "retry": {
+        "delay_seconds": 30,
+        "max_attempts": 2,
+        "strategy": "constant"
+      },
+      "upstream_policy": "all_success"
+    },
+    {
+      "category": "Notifier",
+      "executor": {
+        "type": "email"
+      },
+      "id": "notify_team",
+      "inputs": [],
+      "integrations_used": [
+        "smtp"
+      ],
+      "name": "Notify",
+      "outputs": [],
+      "retry": {
+        "delay_seconds": 30,
+        "max_attempts": 1,
+        "strategy": "constant"
+      },
+      "upstream_policy": "all_success"
+    }
+  ],
+  "description": "Fetch campaigns, transform metrics, send email",
+  "flow": {
+    "edges": [
+      {
+        "edge_type": "success",
+        "from": "fetch_campaigns",
+        "to": "transform_metrics"
+      },
+      {
+        "edge_type": "success",
+        "from": "transform_metrics",
+        "to": "notify_team"
+      }
+    ],
+    "entry_points": [
+      "fetch_campaigns"
+    ],
+    "pattern": "sequential"
+  },
+  "integrations": [
+    {
+      "authentication": {
+        "method": "none"
+      },
+      "id": "ads_api",
+      "type": "api",
+      "used_by_components": []
+    },
+    {
+      "authentication": {
+        "method": "none"
+      },
+      "id": "smtp",
+      "type": "smtp",
+      "used_by_components": []
+    },
+    {
+      "authentication": {
+        "method": "none"
+      },
+      "id": "warehouse",
+      "type": "database",
+      "used_by_components": []
+    }
+  ],
+  "metadata": {
+    "complexity": "medium",
+    "created": "2025-10-01",
+    "domain": "general",
+    "generator": "template",
+    "name": "digital_marketing_pipeline",
+    "owner": "unknown"
+  },
+  "orchspec_version": "1.0",
+  "pipeline_id": "digital_marketing_pipeline",
+  "provenance": {
+    "generated_at": "2025-10-01T08:00:00Z",
+    "original_name": "digital_marketing_pipeline",
+    "source_file": "marketing.txt",
+    "source_type": "step1_json"
+  },
+  "schedule": {
+    "enabled": false
+  }
+}

@@ -1,63 +1,63 @@
-# OPOS Technical Design
+# OrchSpec Technical Design
 
 ## 1. Purpose
 
-OPOS (Open Pipeline Orchestration Specification) is a universal abstraction layer for pipeline generation.
+OrchSpec (Open Pipeline Orchestration Specification) is a universal abstraction layer for pipeline generation.
 
 It separates three concerns:
 1. **Understanding** pipeline intent (`PipeSpec` input).
-2. **Normalizing** that intent into one stable canonical form (`OPOS`).
-3. **Projecting** OPOS into multiple orchestrator-specific outputs (Airflow, Prefect, Dagster, Kestra, Argo, KFP, Flyte).
+2. **Normalizing** that intent into one stable canonical form (`OrchSpec`).
+3. **Projecting** OrchSpec into multiple orchestrator-specific outputs (Airflow, Prefect, Dagster, Kestra, Argo, KFP, Flyte).
 
 In this repository, the implemented scope is:
-- Deterministic `PipeSpec -> OPOS` compilation.
-- OPOS schema and semantic validation.
-- OPOS semantic diff for auditing and regression checks.
+- Deterministic `PipeSpec -> OrchSpec` compilation.
+- OrchSpec schema and semantic validation.
+- OrchSpec semantic diff for auditing and regression checks.
 
-## 2. Why OPOS as a Universal Layer
+## 2. Why OrchSpec as a Universal Layer
 
-Without OPOS, every source format must map directly to every target orchestrator.
+Without OrchSpec, every source format must map directly to every target orchestrator.
 That causes a combinatorial integration problem.
 
-With OPOS:
-- You build each source-to-OPOS mapping once.
-- You build each OPOS-to-target compiler once.
+With OrchSpec:
+- You build each source-to-OrchSpec mapping once.
+- You build each OrchSpec-to-target compiler once.
 - You gain shared validation and comparison across all targets.
 
 ### Integration complexity
 - Direct model: `N sources * M targets` integrations.
-- OPOS model: `N + M` integrations around a stable core.
+- OrchSpec model: `N + M` integrations around a stable core.
 
 ## 3. High-Level Architecture
 
 ```mermaid
 flowchart LR
-  A["Source Spec (PipeSpec)"] --> B["Deterministic Compiler\n(pipespec2opos)"]
-  B --> C["OPOS Canonical Document"]
-  C --> D["Schema Validator\n(opos-validate)"]
-  C --> E["Semantic Validator\n(opos-validate)"]
-  C --> F["Semantic Diff\n(opos-diff)"]
+  A["Source Spec (PipeSpec)"] --> B["Deterministic Compiler\n(pipespec2orchspec)"]
+  B --> C["OrchSpec Canonical Document"]
+  C --> D["Schema Validator\n(orchspec-validate)"]
+  C --> E["Semantic Validator\n(orchspec-validate)"]
+  C --> F["Semantic Diff\n(orchspec-diff)"]
   C --> G["Future Target Compilers\nAirflow/Prefect/Dagster/Kestra/Argo/KFP/Flyte"]
 ```
 
 ## 4. Repository Modules and Responsibilities
 
-- `spec/opos_schema_v1.json`
-  - Canonical JSON Schema for OPOS v1.0.
-- `src/opos_validator/compiler/`
+- `spec/orchspec_schema_v1.json`
+  - Canonical JSON Schema for OrchSpec v1.0.
+- `src/orchspec_validator/compiler/`
   - PipeSpec parsing, normalization, deterministic mapping, strict error handling.
-- `src/opos_validator/validation/`
+- `src/orchspec_validator/validation/`
   - JSON Schema validation plus semantic rules (`SEM001..SEM010`).
-- `src/opos_validator/diff/`
+- `src/orchspec_validator/diff/`
   - Meaning-level change detection with breaking/non-breaking classification.
-- `src/opos_validator/cli/`
-  - User-facing tools: `pipespec2opos`, `opos-validate`, `opos-diff`.
+- `src/orchspec_validator/cli/`
+  - User-facing tools: `pipespec2orchspec`, `orchspec-validate`, `orchspec-diff`.
 
-## 5. Data Model: PipeSpec to OPOS
+## 5. Data Model: PipeSpec to OrchSpec
 
 Core transformation principles:
 1. Preserve semantic meaning.
-2. Normalize names/types to OPOS canonical enums.
+2. Normalize names/types to OrchSpec canonical enums.
 3. Omit null/empty optional fields for stable output.
 4. Ensure deterministic ordering and serialization.
 
@@ -98,7 +98,7 @@ Validation is layered:
 
 ```mermaid
 flowchart TD
-  A["OPOS Document"] --> B["Schema Validation"]
+  A["OrchSpec Document"] --> B["Schema Validation"]
   A --> C["Semantic Validation"]
   B --> D["Validation Report"]
   C --> D
@@ -143,7 +143,7 @@ These IDs make failures scriptable and easy to assert in tests.
 
 ## 9. Semantic Diff Design
 
-`opos-diff` compares OPOS documents at meaning-level, not raw text-level.
+`orchspec-diff` compares OrchSpec documents at meaning-level, not raw text-level.
 
 Core behavior:
 1. Compare top-level identity fields.
@@ -185,9 +185,9 @@ This enables fast smoke tests and deterministic regression checks.
 
 ## 12. Multi-Orchestrator Positioning
 
-Current repository scope stops at OPOS-level standardization and quality gates.
+Current repository scope stops at OrchSpec-level standardization and quality gates.
 
-Future adapters can map OPOS to orchestrators:
+Future adapters can map OrchSpec to orchestrators:
 - Imperative: Airflow, Prefect, Dagster.
 - Declarative/container-native: Kestra, Argo Workflows, Kubeflow, Flyte.
 
@@ -195,7 +195,7 @@ Future adapters can map OPOS to orchestrators:
 
 ```mermaid
 flowchart LR
-  A["OPOS"] --> B["Airflow Adapter"]
+  A["OrchSpec"] --> B["Airflow Adapter"]
   A --> C["Prefect Adapter"]
   A --> D["Dagster Adapter"]
   A --> E["Kestra Adapter"]
@@ -204,11 +204,11 @@ flowchart LR
   A --> H["Flyte Adapter"]
 ```
 
-Each adapter should remain thin by relying on OPOS-normalized semantics.
+Each adapter should remain thin by relying on OrchSpec-normalized semantics.
 
 ## 13. Rules for Extension
 
-When extending OPOS or compiler logic:
+When extending OrchSpec or compiler logic:
 1. Prefer additive, backward-compatible schema changes.
 2. Keep error IDs stable and never reuse old IDs for new meanings.
 3. Add test fixture + unit test for every behavior change.
@@ -218,9 +218,9 @@ When extending OPOS or compiler logic:
 ## 14. Operational Usage Pattern
 
 Recommended pipeline in CI/CD:
-1. Compile PipeSpec to OPOS with strict mode.
-2. Validate generated OPOS.
-3. Compare OPOS against previous version using semantic diff.
+1. Compile PipeSpec to OrchSpec with strict mode.
+2. Validate generated OrchSpec.
+3. Compare OrchSpec against previous version using semantic diff.
 4. Enforce golden check to prevent accidental mapping drift.
 5. Publish artifacts and reports.
 
@@ -228,10 +228,10 @@ This keeps generated pipelines reproducible, auditable, and portable.
 
 ## 15. Summary
 
-OPOS acts as a stable semantic contract between pipeline intent and execution platforms.
+OrchSpec acts as a stable semantic contract between pipeline intent and execution platforms.
 
 The implementation in this repository provides:
-- deterministic normalization (`PipeSpec -> OPOS`),
+- deterministic normalization (`PipeSpec -> OrchSpec`),
 - structured correctness checks (schema + semantics),
 - auditable change tracking (semantic diff),
 - and repeatable quality controls (sample corpus + golden tests).
@@ -242,23 +242,23 @@ This foundation enables confident multi-orchestrator pipeline generation at scal
 
 This implementation now includes four hardening steps:
 1. **Strict PipeSpec Profile**: enforced by `spec/pipespec_profile_v1.json` before compile starts.
-2. **Formal Mapping Spec**: `spec/mappings/pipespec_to_opos_v1.json` drives mapping tables and invariants.
+2. **Formal Mapping Spec**: `spec/mappings/pipespec_to_orchspec_v1.json` drives mapping tables and invariants.
 3. **Expanded Semantic Rules**:
    - `SEM011` unreachable components
    - `SEM012` disconnected subgraphs
    - `SEM013` retry policy coherence
    - strict mode promotion of `SEM010` warning to error
-4. **Adapter Interfaces**: `src/opos_validator/adapters/` provides a stable projection interface and stub adapters for future targets.
+4. **Adapter Interfaces**: `src/orchspec_validator/adapters/` provides a stable projection interface and stub adapters for future targets.
 
 ### Strict Validation Mode
 
-`opos-validate --strict` now enforces stronger compatibility checks by promoting compatibility warnings into errors.
+`orchspec-validate --strict` now enforces stronger compatibility checks by promoting compatibility warnings into errors.
 
 ### Adapter Interface Flow
 
 ```mermaid
 flowchart TD
-  A["OPOS Document"] --> B["Adapter Invariant Validation"]
+  A["OrchSpec Document"] --> B["Adapter Invariant Validation"]
   B --> C["Target Stub Adapter"]
   C --> D["ProjectionResult (stub_ir)"]
 ```

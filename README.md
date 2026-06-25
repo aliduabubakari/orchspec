@@ -1,43 +1,43 @@
-# OPOS
+# OrchSpec
 
-OPOS is a standalone standard for pipeline orchestration abstraction.
+OrchSpec is a standalone standard for pipeline orchestration abstraction.
 
 This repository publishes:
-- OPOS v1.0 schema and specification
-- Deterministic `pipespec2opos` compiler
-- `opos-validate` schema+semantic validator
-- `opos-diff` semantic comparator
+- OrchSpec v1.0 schema and specification
+- Deterministic `pipespec2orchspec` compiler
+- `orchspec-validate` schema+semantic validator
+- `orchspec-diff` semantic comparator
 - Adapter interfaces/stubs for future multi-orchestrator projection
 
 ## Install
 
 ```bash
-pip install opos-validator
+pip install orchspec-validator
 ```
 
 ## CLI
 
 ```bash
-pipespec2opos input.json --out output.yaml --format yaml --strict
-opos-validate output.yaml --json-report
-opos-validate output.yaml --strict
-opos-diff old.yaml new.yaml --json-report
+pipespec2orchspec input.json --out output.yaml --format yaml --strict
+orchspec-validate output.yaml --json-report
+orchspec-validate output.yaml --strict
+orchspec-diff old.yaml new.yaml --json-report
 ```
 
 ## Python API
 
 ```python
-from opos_validator import CompileOptions, compile_pipespec_to_opos, validate_opos, semantic_diff_opos
+from orchspec_validator import CompileOptions, compile_pipespec_to_orchspec, validate_orchspec, semantic_diff_orchspec
 
-opos = compile_pipespec_to_opos(pipespec_doc, options=CompileOptions(strict=True))
-report = validate_opos(opos, strict=True)
-diff = semantic_diff_opos(opos_a, opos_b)
+orchspec = compile_pipespec_to_orchspec(pipespec_doc, options=CompileOptions(strict=True))
+report = validate_orchspec(orchspec, strict=True)
+diff = semantic_diff_orchspec(orchspec_a, orchspec_b)
 ```
 
 ## Compiler Contracts
 
 - Strict PipeSpec profile: `spec/pipespec_profile_v1.json`
-- Formal mapping spec: `spec/mappings/pipespec_to_opos_v1.json`
+- Formal mapping spec: `spec/mappings/pipespec_to_orchspec_v1.json`
 
 ## Golden Regression Workflow
 
@@ -61,6 +61,6 @@ make update-golden
 
 - `spec/` canonical schema, profile, and mapping specs
 - `docs/` field references and compiler rules
-- `src/opos_validator/` package source
+- `src/orchspec_validator/` package source
 - `tests/` unit/integration and golden determinism tests
 - `samples/pipespecs/` short corpus for valid/invalid scenario testing

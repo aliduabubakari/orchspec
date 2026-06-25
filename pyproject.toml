@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "opos-validator"
+name = "orchspec-validator"
 version = "1.0.0"
-description = "OPOS v1.0 compiler, validator, and semantic diff tools"
+description = "OrchSpec v1.0 compiler, validator, and semantic diff tools"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
-authors = [{name = "OPOS Contributors"}]
+authors = [{name = "OrchSpec Contributors"}]
 dependencies = [
   "jsonschema>=4.22.0",
   "PyYAML>=6.0.1",
@@ -23,9 +23,9 @@ dev = [
 ]
 
 [project.scripts]
-opos-validate = "opos_validator.cli.validate:main"
-opos-diff = "opos_validator.cli.diff:main"
-pipespec2opos = "opos_validator.cli.compile:main"
+orchspec-validate = "orchspec_validator.cli.validate:main"
+orchspec-diff = "orchspec_validator.cli.diff:main"
+pipespec2orchspec = "orchspec_validator.cli.compile:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}

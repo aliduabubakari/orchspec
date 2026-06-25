@@ -1,31 +1,31 @@
 # PipeSpec Test Corpus
 
-This folder contains short PipeSpec fixtures for testing OPOS compilation and validation.
+This folder contains short PipeSpec fixtures for testing OrchSpec compilation and validation.
 
 ## Structure
 - `valid/`: should compile and validate cleanly.
-- `invalid_compile/`: should fail during `pipespec2opos --strict` with `COMP` errors.
-- `invalid_semantic/`: should compile but fail `opos-validate` with `SEM` errors.
+- `invalid_compile/`: should fail during `pipespec2orchspec --strict` with `COMP` errors.
+- `invalid_semantic/`: should compile but fail `orchspec-validate` with `SEM` errors.
 
 ## Suggested usage
 
 Compile strict:
 
 ```bash
-pipespec2opos samples/pipespecs/valid/ok_sequential.json --out /tmp/out.json --strict
+pipespec2orchspec samples/pipespecs/valid/ok_sequential.json --out /tmp/out.json --strict
 ```
 
 Expected compile failure:
 
 ```bash
-pipespec2opos samples/pipespecs/invalid_compile/comp001_unknown_executor.json --out /tmp/out.json --strict
+pipespec2orchspec samples/pipespecs/invalid_compile/comp001_unknown_executor.json --out /tmp/out.json --strict
 ```
 
 Semantic failure flow:
 
 ```bash
-pipespec2opos samples/pipespecs/invalid_semantic/sem009_schedule_without_cron.json --out /tmp/out.json --strict
-opos-validate /tmp/out.json
+pipespec2orchspec samples/pipespecs/invalid_semantic/sem009_schedule_without_cron.json --out /tmp/out.json --strict
+orchspec-validate /tmp/out.json
 ```
 
 ## Fixture index

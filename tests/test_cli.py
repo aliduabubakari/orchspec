@@ -15,7 +15,7 @@ def test_cli_compile_validate_diff(tmp_path: Path) -> None:
     compile_cmd = [
         sys.executable,
         "-m",
-        "opos_validator.cli.compile",
+        "orchspec_validator.cli.compile",
         str(input_path),
         "--out",
         str(out_path),
@@ -29,7 +29,7 @@ def test_cli_compile_validate_diff(tmp_path: Path) -> None:
     validate_cmd = [
         sys.executable,
         "-m",
-        "opos_validator.cli.validate",
+        "orchspec_validator.cli.validate",
         str(out_path),
         "--json-report",
     ]
@@ -41,7 +41,7 @@ def test_cli_compile_validate_diff(tmp_path: Path) -> None:
     diff_cmd = [
         sys.executable,
         "-m",
-        "opos_validator.cli.diff",
+        "orchspec_validator.cli.diff",
         str(out_path),
         str(out_path),
         "--json-report",

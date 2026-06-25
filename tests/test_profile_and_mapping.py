@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 
-from opos_validator import CompileOptions, compile_pipespec_to_opos, validate_opos
-from opos_validator.compiler.mapping_spec import load_mapping_spec
+from orchspec_validator import CompileOptions, compile_pipespec_to_orchspec, validate_orchspec
+from orchspec_validator.compiler.mapping_spec import load_mapping_spec
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -20,7 +20,7 @@ def test_profile_rejects_unknown_top_level_key() -> None:
     pipespec["unexpected"] = "x"
 
     with pytest.raises(ValueError) as exc:
-        compile_pipespec_to_opos(pipespec, options=CompileOptions(strict=True, enforce_profile=True))
+        compile_pipespec_to_orchspec(pipespec, options=CompileOptions(strict=True, enforce_profile=True))
 
     assert "COMP012" in str(exc.value)
 
@@ -35,7 +35,7 @@ def test_mapping_spec_has_required_sections() -> None:
     assert "orchestrator_invariants" in spec
 
 
-def test_profile_accepts_full_pipespec_flow_and_compiles_to_valid_opos() -> None:
+def test_profile_accepts_full_pipespec_flow_and_compiles_to_valid_orchspec() -> None:
     pipespec = {
         "pipespec_version": "1.0",
         "metadata": {
@@ -199,17 +199,17 @@ def test_profile_accepts_full_pipespec_flow_and_compiles_to_valid_opos() -> None
         },
     }
 
-    opos = compile_pipespec_to_opos(pipespec, options=CompileOptions(strict=True, enforce_profile=True))
-    report = validate_opos(opos, strict=True)
+    orchspec = compile_pipespec_to_orchspec(pipespec, options=CompileOptions(strict=True, enforce_profile=True))
+    report = validate_orchspec(orchspec, strict=True)
 
     assert report.valid is True
-    assert opos["components"][0]["id"] == "group_start"
-    assert opos["components"][1]["id"] == "load_results"
-    assert opos["integrations"][0]["type"] == "custom"
-    assert opos["schedule"]["enabled"] is True
-    assert opos["schedule"]["cron"] == "@daily"
-    assert opos["schedule"]["start_date"] == "2024-01-01T00:00:00Z"
-    assert opos["flow"]["edges"][0]["edge_type"] == "success"
+    assert orchspec["components"][0]["id"] == "group_start"
+    assert orchspec["components"][1]["id"] == "load_results"
+    assert orchspec["integrations"][0]["type"] == "custom"
+    assert orchspec["schedule"]["enabled"] is True
+    assert orchspec["schedule"]["cron"] == "@daily"
+    assert orchspec["schedule"]["start_date"] == "2024-01-01T00:00:00Z"
+    assert orchspec["flow"]["edges"][0]["edge_type"] == "success"
 
 
 def test_mapping_normalizes_schedule_value_auth_password_and_unknown() -> None:
@@ -305,12 +305,12 @@ def test_mapping_normalizes_schedule_value_auth_password_and_unknown() -> None:
         },
     }
 
-    opos = compile_pipespec_to_opos(pipespec, options=CompileOptions(strict=True, enforce_profile=True))
-    report = validate_opos(opos, strict=True)
+    orchspec = compile_pipespec_to_orchspec(pipespec, options=CompileOptions(strict=True, enforce_profile=True))
+    report = validate_orchspec(orchspec, strict=True)
 
     assert report.valid is True
-    assert opos["schedule"]["catchup"] is False
-    assert opos["schedule"]["start_date"] == "2024-01-01T00:00:00Z"
-    assert opos["integrations"][0]["authentication"]["method"] == "basic"
-    assert opos["integrations"][0]["authentication"]["password_secret"] == "DB_PASSWORD"
-    assert opos["integrations"][1]["authentication"]["method"] == "none"
+    assert orchspec["schedule"]["catchup"] is False
+    assert orchspec["schedule"]["start_date"] == "2024-01-01T00:00:00Z"
+    assert orchspec["integrations"][0]["authentication"]["method"] == "basic"
+    assert orchspec["integrations"][0]["authentication"]["password_secret"] == "DB_PASSWORD"
+    assert orchspec["integrations"][1]["authentication"]["method"] == "none"

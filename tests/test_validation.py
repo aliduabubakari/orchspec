@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from opos_validator import validate_opos
+from orchspec_validator import validate_orchspec
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -14,17 +14,17 @@ def _load_json(path: Path) -> dict:
 
 def test_valid_compiled_airvisual() -> None:
     pipespec = _load_json(ROOT / "spec" / "examples" / "pipespec" / "airvisual_pipeline.json")
-    from opos_validator import CompileOptions, compile_pipespec_to_opos
+    from orchspec_validator import CompileOptions, compile_pipespec_to_orchspec
 
-    opos = compile_pipespec_to_opos(pipespec, options=CompileOptions(strict=True))
-    report = validate_opos(opos)
+    orchspec = compile_pipespec_to_orchspec(pipespec, options=CompileOptions(strict=True))
+    report = validate_orchspec(orchspec)
     assert report.valid is True
     assert not report.errors
 
 
 def test_semantic_missing_integration() -> None:
     doc = {
-        "opos_version": "1.0",
+        "orchspec_version": "1.0",
         "pipeline_id": "x",
         "description": "x",
         "metadata": {"name": "x", "owner": "o", "domain": "d", "complexity": "low"},
@@ -39,6 +39,6 @@ def test_semantic_missing_integration() -> None:
         ],
         "flow": {"pattern": "sequential", "entry_points": ["c1"], "edges": []}
     }
-    report = validate_opos(doc)
+    report = validate_orchspec(doc)
     assert report.valid is False
     assert any(e.code == "SEM004" for e in report.errors)

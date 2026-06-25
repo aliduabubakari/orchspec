@@ -15,12 +15,12 @@
 | Item | Value |
 |------|-------|
 | **Project name** | OrchSpec (the Orchestrator-Agnostic Canonical Specification) |
-| **Package name** | `opos-validator` |
-| **Import name** | `opos_validator` |
-| **CLI entries** | `pipespec2opos` / `opos-validate` / `opos-diff` |
+| **Package name** | `orchspec-validator` |
+| **Import name** | `orchspec_validator` |
+| **CLI entries** | `pipespec2orchspec` / `orchspec-validate` / `orchspec-diff` |
 | **Python** | ≥3.10 |
 | **Build system** | setuptools |
-| **Schema version** | OPOS Schema v1.0 (`spec/opos_schema_v1.json`) |
+| **Schema version** | OrchSpec Schema v1.0 (`spec/orchspec_schema_v1.json`) |
 | **License** | Apache-2.0 |
 
 ---
@@ -28,50 +28,50 @@
 ## 2. Repository Layout
 
 ```
-opos/
+orchspec/
 ├── spec/                                  # Canonical schema, profile, and mapping specs (normative)
-│   ├── opos_schema_v1.json                #   THE normative OPOS JSON Schema (single source of truth)
-│   ├── opos-spec-v1.md                    #   Specification overview document
+│   ├── orchspec_schema_v1.json                #   THE normative OrchSpec JSON Schema (single source of truth)
+│   ├── orchspec-spec-v1.md                    #   Specification overview document
 │   ├── pipespec_profile_v1.json           #   Strict PipeSpec input profile enforced before compile
 │   ├── mappings/
-│   │   └── pipespec_to_opos_v1.json       #   Formal mapping spec driving compiler tables + invariants
+│   │   └── pipespec_to_orchspec_v1.json       #   Formal mapping spec driving compiler tables + invariants
 │   └── examples/
 │       ├── pipespec/                      #   Example PipeSpec input documents
-│       └── opos/                          #   Compiled OPOS output examples (YAML)
+│       └── orchspec/                          #   Compiled OrchSpec output examples (YAML)
 │
-├── src/opos_validator/                    # Python package
+├── src/orchspec_validator/                    # Python package
 │   ├── __init__.py                        #   Public API surface (compile, validate, diff, adapters)
 │   ├── io.py                              #   File I/O helpers
-│   ├── compiler/                          #   PipeSpec → OPOS deterministic compiler
+│   ├── compiler/                          #   PipeSpec → OrchSpec deterministic compiler
 │   │   ├── __init__.py
-│   │   ├── api.py                         #     compile_pipespec_to_opos() public entry
+│   │   ├── api.py                         #     compile_pipespec_to_orchspec() public entry
 │   │   ├── mapper.py                      #     Core compilation implementation
 │   │   ├── mapping_spec.py                #     Mapping spec loader + driven lookup tables
 │   │   ├── profile.py                     #     PipeSpec input profile validation
 │   │   └── models.py                      #     CompileOptions, CompileError
-│   ├── validation/                        #   OPOS schema + semantic validation
+│   ├── validation/                        #   OrchSpec schema + semantic validation
 │   │   ├── __init__.py
-│   │   ├── api.py                         #     validate_opos() public entry
+│   │   ├── api.py                         #     validate_orchspec() public entry
 │   │   ├── schema.py                      #     JSON Schema validation wrapper
 │   │   ├── semantic.py                    #     Semantic rule engine (SEM001–SEM013)
 │   │   └── models.py                      #     ValidationIssue, ValidationReport
 │   ├── diff/                              #   Semantic diff engine
 │   │   ├── __init__.py
-│   │   ├── api.py                         #     semantic_diff_opos() public entry
+│   │   ├── api.py                         #     semantic_diff_orchspec() public entry
 │   │   ├── core.py                        #     Diff implementation (meaning-level comparison)
 │   │   └── models.py                      #     DiffReport, change classification
 │   ├── adapters/                          #   Multi-orchestrator projection stubs
 │   │   ├── __init__.py
-│   │   ├── interface.py                   #     OposAdapter Protocol (capability, invariants, project)
+│   │   ├── interface.py                   #     OrchspecAdapter Protocol (capability, invariants, project)
 │   │   ├── invariants.py                  #     Adapter invariant validation
 │   │   ├── models.py                      #     AdapterCapability, ProjectionResult
 │   │   ├── registry.py                    #     Adapter registry (get_default_adapters)
 │   │   └── stubs.py                       #     Stub adapters for future targets
 │   └── cli/                               #   User-facing CLI tools (Typer + Rich)
 │       ├── __init__.py
-│       ├── compile.py                     #     pipespec2opos
-│       ├── validate.py                    #     opos-validate
-│       └── diff.py                        #     opos-diff
+│       ├── compile.py                     #     pipespec2orchspec
+│       ├── validate.py                    #     orchspec-validate
+│       └── diff.py                        #     orchspec-diff
 │
 ├── samples/pipespecs/                     # Short PipeSpec corpus for taxonomy coverage
 │   ├── valid/                             #   Clean-pass scenarios
@@ -88,13 +88,13 @@ opos/
 │   ├── test_golden.py                     #   Deterministic golden regression tests
 │   ├── test_profile_and_mapping.py        #   Profile + mapping spec tests
 │   ├── test_semantic_strict.py            #   Strict mode semantic promotion tests
-│   └── fixtures/                          #   Test fixtures (golden outputs, OPOS/PipeSpec samples)
+│   └── fixtures/                          #   Test fixtures (golden outputs, OrchSpec/PipeSpec samples)
 │
 ├── docs/                                  # Documentation
 │   ├── changelog.md
 │   ├── compiler-guide.md                  #   Compiler mapping rules reference
 │   ├── execution-modes.md                 #   Executor type reference
-│   └── field-reference.md                 #   OPOS field definitions
+│   └── field-reference.md                 #   OrchSpec field definitions
 │
 ├── tools/
 │   └── golden.py                          #   Golden file check/update tool
@@ -114,23 +114,23 @@ opos/
 OrchSpec separates pipeline generation into three concerns:
 
 1. **Understanding** — pipeline intent expressed as PipeSpec input.
-2. **Normalizing** — deterministic compilation of PipeSpec into the canonical OrchSpec (OPOS) form.
+2. **Normalizing** — deterministic compilation of PipeSpec into the canonical OrchSpec (OrchSpec) form.
 3. **Projecting** — mapping OrchSpec into orchestrator-specific output (Airflow, Prefect, Dagster, Kestra, Argo, KFP, Flyte).
 
 This repository implements layers 2 and 3 (stubs), along with validation and diff tooling.
 
 ### 3.2 Canonical Schema
 
-- **`spec/opos_schema_v1.json`** is the single normative source of truth for OPOS structure.
+- **`spec/orchspec_schema_v1.json`** is the single normative source of truth for OrchSpec structure.
 - The compiler produces documents that MUST validate against this schema.
 - `spec/pipespec_profile_v1.json` is a strict input profile applied *before* compilation begins.
-- `spec/mappings/pipespec_to_opos_v1.json` is a formal mapping spec that drives compiler lookup tables and invariants.
+- `spec/mappings/pipespec_to_orchspec_v1.json` is a formal mapping spec that drives compiler lookup tables and invariants.
 
 ### 3.3 Validation Layers
 
 Validation is two-tiered:
 
-1. **Schema validation** (`validation/schema.py`) — structural checks against `opos_schema_v1.json`. Error family: `SCHEMA_*`.
+1. **Schema validation** (`validation/schema.py`) — structural checks against `orchspec_schema_v1.json`. Error family: `SCHEMA_*`.
 2. **Semantic validation** (`validation/semantic.py`) — cross-field and graph-level invariants that schema alone cannot enforce. Error family: `SEM001`–`SEM013`.
 
 | Rule | Description |
@@ -151,7 +151,7 @@ Validation is two-tiered:
 
 ### 3.4 Strict Mode
 
-`opos-validate --strict` promotes `SEM010` from a warning to an error. The compiler also supports a `CompileOptions(strict=True)` mode that:
+`orchspec-validate --strict` promotes `SEM010` from a warning to an error. The compiler also supports a `CompileOptions(strict=True)` mode that:
 - Enforces the PipeSpec input profile.
 - Emits stable `COMP00x` error IDs for unknown executors, missing fields, empty lists, etc.
 - Rejects unsupported PipeSpec versions.
@@ -183,7 +183,7 @@ Stable error IDs make failures scriptable and testable:
 
 ### 3.7 Semantic Diff Design
 
-`opos-diff` compares OPOS documents at the meaning level, not raw text. Core behavior:
+`orchspec-diff` compares OrchSpec documents at the meaning level, not raw text. Core behavior:
 
 1. Compare top-level identity fields.
 2. Compare components by stable `id`.
@@ -198,13 +198,13 @@ Change classes:
 
 ### 3.8 Adapter Interface
 
-`src/opos_validator/adapters/interface.py` defines the `OposAdapter` Protocol:
+`src/orchspec_validator/adapters/interface.py` defines the `OrchspecAdapter` Protocol:
 
 ```python
-class OposAdapter(Protocol):
+class OrchspecAdapter(Protocol):
     def capability(self) -> AdapterCapability: ...
-    def validate_invariants(self, opos_doc: dict) -> list[str]: ...
-    def project(self, opos_doc: dict) -> ProjectionResult: ...
+    def validate_invariants(self, orchspec_doc: dict) -> list[str]: ...
+    def project(self, orchspec_doc: dict) -> ProjectionResult: ...
 ```
 
 Stub adapters live in `adapters/stubs.py` for future Airflow, Prefect, Dagster, Kestra, Argo, KFP, and Flyte targets.
@@ -251,12 +251,12 @@ make update-golden
 
 ### 5.3 Public API Surface
 
-From `src/opos_validator/__init__.py`:
+From `src/orchspec_validator/__init__.py`:
 
 ```python
-compile_pipespec_to_opos    # Compile PipeSpec dict → OPOS dict
-validate_opos               # Validate OPOS dict (schema + semantics)
-semantic_diff_opos          # Compare two OPOS dicts (meaning-level diff)
+compile_pipespec_to_orchspec    # Compile PipeSpec dict → OrchSpec dict
+validate_orchspec               # Validate OrchSpec dict (schema + semantics)
+semantic_diff_orchspec          # Compare two OrchSpec dicts (meaning-level diff)
 get_default_adapters        # Return default adapter registry
 ```
 
@@ -264,9 +264,9 @@ get_default_adapters        # Return default adapter registry
 
 - Uses **Typer** + **Rich** for console output.
 - Exit codes: `0` = success, non-zero for failures.
-- `pipespec2opos` supports `--out`, `--format`, `--strict` flags.
-- `opos-validate` supports `--json-report`, `--strict` flags.
-- `opos-diff` supports `--json-report` flag.
+- `pipespec2orchspec` supports `--out`, `--format`, `--strict` flags.
+- `orchspec-validate` supports `--json-report`, `--strict` flags.
+- `orchspec-diff` supports `--json-report` flag.
 
 ---
 
@@ -287,9 +287,9 @@ PYTHONPATH=src pytest tests/test_semantic_strict.py      # Strict mode semantic 
 ### Test fixture locations
 
 - `tests/fixtures/pipespec/` — PipeSpec input fixtures for compilation tests.
-- `tests/fixtures/opos/` — OPOS document fixtures for validation tests.
+- `tests/fixtures/orchspec/` — OrchSpec document fixtures for validation tests.
 - `tests/fixtures/golden/` — canonical golden outputs for determinism regression.
-- `tests/fixtures/invalid_opos/` — deliberately invalid OPOS documents.
+- `tests/fixtures/invalid_orchspec/` — deliberately invalid OrchSpec documents.
 - `samples/pipespecs/` — short corpus organized by scenario type (valid, invalid_compile, invalid_semantic).
 
 ### Test conventions
@@ -305,7 +305,7 @@ PYTHONPATH=src pytest tests/test_semantic_strict.py      # Strict mode semantic 
 
 ### Add a new semantic rule
 
-1. Add the rule function in `src/opos_validator/validation/semantic.py`.
+1. Add the rule function in `src/orchspec_validator/validation/semantic.py`.
 2. Name it following the pattern of existing rules (e.g., `SEM014`).
 3. Register it in the `validate_semantics()` function.
 4. Add a test fixture in `samples/pipespecs/invalid_semantic/` that triggers the new rule.
@@ -315,7 +315,7 @@ PYTHONPATH=src pytest tests/test_semantic_strict.py      # Strict mode semantic 
 
 ### Add a new compiler error (`COMP` code)
 
-1. Raise a `CompileError` with the new code in `src/opos_validator/compiler/mapper.py`.
+1. Raise a `CompileError` with the new code in `src/orchspec_validator/compiler/mapper.py`.
 2. Assign the next available number in the `COMP0xx` sequence.
 3. Add a fixture in `samples/pipespecs/invalid_compile/` that triggers the error.
 4. Add a test in `tests/test_compiler.py`.
@@ -323,24 +323,24 @@ PYTHONPATH=src pytest tests/test_semantic_strict.py      # Strict mode semantic 
 
 ### Extend the compiler mapping
 
-1. Edit `spec/mappings/pipespec_to_opos_v1.json` for mapping table changes.
-2. Update `src/opos_validator/compiler/mapping_spec.py` if new loader logic is needed.
-3. Update `src/opos_validator/compiler/mapper.py` for implementation logic.
+1. Edit `spec/mappings/pipespec_to_orchspec_v1.json` for mapping table changes.
+2. Update `src/orchspec_validator/compiler/mapping_spec.py` if new loader logic is needed.
+3. Update `src/orchspec_validator/compiler/mapper.py` for implementation logic.
 4. Run `make golden-check` to detect any deterministic output changes.
 5. If intentional, run `make update-golden` to regenerate golden fixtures.
 6. Add/update tests in `tests/test_compiler.py`.
 
 ### Add a new adapter stub
 
-1. Create the stub class in `src/opos_validator/adapters/stubs.py` implementing the `OposAdapter` Protocol.
-2. Add invariant rules in `src/opos_validator/adapters/invariants.py`.
-3. Register the adapter in `src/opos_validator/adapters/registry.py`.
+1. Create the stub class in `src/orchspec_validator/adapters/stubs.py` implementing the `OrchspecAdapter` Protocol.
+2. Add invariant rules in `src/orchspec_validator/adapters/invariants.py`.
+3. Register the adapter in `src/orchspec_validator/adapters/registry.py`.
 4. Add tests in `tests/test_adapters.py`.
 
-### Change the OPOS schema
+### Change the OrchSpec schema
 
-1. Edit `spec/opos_schema_v1.json` (the normative schema).
-2. Update `spec/opos-spec-v1.md` if the spec document needs updating.
+1. Edit `spec/orchspec_schema_v1.json` (the normative schema).
+2. Update `spec/orchspec-spec-v1.md` if the spec document needs updating.
 3. Re-run tests: `make test`.
 4. Update golden files if output shape changes: `make update-golden`.
 5. Update `docs/field-reference.md` if field definitions change.
@@ -355,14 +355,14 @@ PYTHONPATH=src pytest tests/test_semantic_strict.py      # Strict mode semantic 
 
 ## 8. Design Constraints (DO NOT VIOLATE)
 
-1. **Normative schema is king.** `spec/opos_schema_v1.json` is the only source of truth for OPOS structure. All validation MUST use it.
+1. **Normative schema is king.** `spec/orchspec_schema_v1.json` is the only source of truth for OrchSpec structure. All validation MUST use it.
 2. **Determinism is non-negotiable.** Given the same PipeSpec input bytes and compiler version, output MUST be semantically identical and canonically serialized. No runtime-generated timestamps, random IDs, or nondeterministic ordering.
 3. **Error IDs must be stable.** Never reuse an old `COMP` or `SEM` code for a new meaning. Codes are part of the public contract.
 4. **Strict PipeSpec profile enforced before compile.** `spec/pipespec_profile_v1.json` is validated before mapping begins.
-5. **Adapter stubs are thin.** Adapters should rely on OPOS-normalized semantics. Do not add heavy logic — the adapter Protocol defines the contract; implementation details stay in the stub modules.
+5. **Adapter stubs are thin.** Adapters should rely on OrchSpec-normalized semantics. Do not add heavy logic — the adapter Protocol defines the contract; implementation details stay in the stub modules.
 6. **Semantic checks can be additive but not destructive.** Add new `SEM` rules freely. Do not remove existing rules without a schema version bump.
 7. **Golden tests are the regression contract.** Run `make golden-check` before committing. Only run `make update-golden` when mapping behavior intentionally changes.
-8. **Preserve semantic meaning through normalization.** The compiler normalizes names/types to OPOS canonical enums, omits null/empty optional fields, and ensures deterministic ordering — but must never change pipeline intent.
+8. **Preserve semantic meaning through normalization.** The compiler normalizes names/types to OrchSpec canonical enums, omits null/empty optional fields, and ensures deterministic ordering — but must never change pipeline intent.
 
 ---
 
@@ -371,12 +371,12 @@ PYTHONPATH=src pytest tests/test_semantic_strict.py      # Strict mode semantic 
 | File | When to read |
 |------|-------------|
 | `technical.md` | Understanding the full design rationale, architecture, and bounded scope |
-| `spec/opos_schema_v1.json` | OPOS canonical schema structure |
-| `spec/opos-spec-v1.md` | Specification overview and normative artifacts |
-| `spec/mappings/pipespec_to_opos_v1.json` | Formal compiler mapping tables |
+| `spec/orchspec_schema_v1.json` | OrchSpec canonical schema structure |
+| `spec/orchspec-spec-v1.md` | Specification overview and normative artifacts |
+| `spec/mappings/pipespec_to_orchspec_v1.json` | Formal compiler mapping tables |
 | `spec/pipespec_profile_v1.json` | Strict PipeSpec input profile |
 | `docs/compiler-guide.md` | Compiler mapping rules and transformation reference |
-| `docs/field-reference.md` | OPOS field definitions |
+| `docs/field-reference.md` | OrchSpec field definitions |
 | `docs/execution-modes.md` | Executor type reference |
 | `docs/changelog.md` | History of changes and extension rules |
 | `README.md` | User-facing documentation and CLI quickstart |
@@ -391,10 +391,10 @@ OrchSpec consumes **PipeSpec** documents as input. PipeSpec is a separate projec
 - The canonical PipeSpec schema (`pipespec_schema_v1.json`).
 - LLM-assisted generation and correction tooling.
 
-OrchSpec's `pipespec2opos` compiler expects input that validates against the PipeSpec schema. The two projects share the same pipeline domain model but operate at different layers: **PipeSpec** captures intent; **OrchSpec** normalizes it into an orchestrator-agnostic canonical form.
+OrchSpec's `pipespec2orchspec` compiler expects input that validates against the PipeSpec schema. The two projects share the same pipeline domain model but operate at different layers: **PipeSpec** captures intent; **OrchSpec** normalizes it into an orchestrator-agnostic canonical form.
 
 When changes span both projects (e.g., extending the PipeSpec schema), coordinate updates:
 1. Update PipeSpec schema first.
-2. Update OrchSpec's `spec/pipespec_profile_v1.json` and `spec/mappings/pipespec_to_opos_v1.json` to match.
+2. Update OrchSpec's `spec/pipespec_profile_v1.json` and `spec/mappings/pipespec_to_orchspec_v1.json` to match.
 3. Update the compiler, add fixtures, and regenerate golden files.
 4. Run full test suites in both projects.

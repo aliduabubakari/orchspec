@@ -1,0 +1,10 @@
+{
+  "orchspec_version": "1.0",
+  "pipeline_id": "bad",
+  "description": "bad",
+  "metadata": {"name": "bad", "owner": "x", "domain": "x", "complexity": "low"},
+  "components": [
+    {"id": "a", "name": "A", "category": "Extractor", "executor": {"type": "python_script"}}
+  ],
+  "flow": {"pattern": "sequential", "entry_points": ["missing"], "edges": []}
+}

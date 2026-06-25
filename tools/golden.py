@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Golden fixture management for PipeSpec -> OPOS outputs."""
+"""Golden fixture management for PipeSpec -> OrchSpec outputs."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import argparse
 import json
 from pathlib import Path
 
-from opos_validator import CompileOptions, compile_pipespec_to_opos
+from orchspec_validator import CompileOptions, compile_pipespec_to_orchspec
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,7 +17,7 @@ GOLDEN_DIR = ROOT / "tests" / "fixtures" / "golden"
 
 def _render_compiled(path: Path) -> str:
     pipespec = json.loads(path.read_text(encoding="utf-8"))
-    compiled = compile_pipespec_to_opos(pipespec, options=CompileOptions(strict=True))
+    compiled = compile_pipespec_to_orchspec(pipespec, options=CompileOptions(strict=True))
     return json.dumps(compiled, indent=2, sort_keys=True) + "\n"
 
 
@@ -26,7 +26,7 @@ def update_golden() -> int:
     count = 0
     for pipespec_path in sorted(PIPESPEC_DIR.glob("*.json")):
         rendered = _render_compiled(pipespec_path)
-        golden_name = pipespec_path.name.replace(".json", ".opos.json")
+        golden_name = pipespec_path.name.replace(".json", ".orchspec.json")
         golden_path = GOLDEN_DIR / golden_name
         golden_path.write_text(rendered, encoding="utf-8")
         count += 1
@@ -40,7 +40,7 @@ def check_golden() -> int:
 
     for pipespec_path in sorted(PIPESPEC_DIR.glob("*.json")):
         rendered = _render_compiled(pipespec_path)
-        golden_name = pipespec_path.name.replace(".json", ".opos.json")
+        golden_name = pipespec_path.name.replace(".json", ".orchspec.json")
         golden_path = GOLDEN_DIR / golden_name
         if not golden_path.exists():
             missing.append(golden_name)

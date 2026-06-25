@@ -1,0 +1,27 @@
+orchspec_version: '1.0'
+pipeline_id: pm25_alert_pipeline
+description: Check PM2.5 and alert
+metadata:
+  name: pm25_alert_pipeline
+  owner: unknown
+  domain: general
+  complexity: low
+components:
+  - id: extract_pm25
+    name: Extract PM2.5
+    category: Extractor
+    executor:
+      type: http_request
+  - id: validate_threshold
+    name: Validate Threshold
+    category: QualityCheck
+    executor:
+      type: python_script
+flow:
+  pattern: sequential
+  entry_points:
+    - extract_pm25
+  edges:
+    - from: extract_pm25
+      to: validate_threshold
+      edge_type: success

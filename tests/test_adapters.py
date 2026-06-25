@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from opos_validator import get_default_adapters
+from orchspec_validator import get_default_adapters
 
 
 def _doc() -> dict:
     return {
-        "opos_version": "1.0",
+        "orchspec_version": "1.0",
         "pipeline_id": "sample",
         "description": "sample",
         "metadata": {"name": "Sample", "owner": "Team", "domain": "demo", "complexity": "low"},
