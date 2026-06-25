@@ -1,13 +1,41 @@
 # OrchSpec
 
-**Orchestration Specification** — a platform-agnostic pipeline abstraction standard with a deterministic compiler, multi-layered validator, semantic diff engine, and an extensible adapter framework for projecting pipelines onto any orchestrator.
+**Orchestration Specification** — the canonical intermediate representation for pipeline orchestration. OrchSpec is the deterministic compilation target for [PipeSpec](https://github.com/aliduabubakari/pipespec) documents, and the standard input for multi-orchestrator projection adapters.
 
-OrchSpec is not tied to a single execution engine. It defines a canonical intermediate representation (IR) that can be consumed, validated, diffed, and projected to imperative or declarative orchestrators through pluggable adapters.
+---
+
+## The Pipeline: PipeSpec → OrchSpec → Orchestrator
+
+OrchSpec sits at the center of a three-stage pipeline lifecycle:
+
+```
+Natural Language / Code Description
+        │
+        ▼  [LLM Extraction]
+   PipeSpec v1.0          ← Extraction format (LLM-friendly, human-oriented)
+        │
+        ▼  [pipespec2orchspec compiler]
+   OrchSpec v1.0          ← Canonical IR (strict, deterministic, validated)  ★ you are here
+        │
+        ▼  [Adapter projection]
+   Airflow / Prefect /    ← Target orchestrator DAGs
+   Dagster / Kestra /
+   Argo / Kubeflow / Flyte
+```
+
+| Stage | Tool | Repository |
+|-------|------|------------|
+| **Extract** | PipeSpec | [aliduabubakari/pipespec](https://github.com/aliduabubakari/pipespec) |
+| **Compile & Validate** | OrchSpec | this repository |
+| **Deploy** | Adapters | built into OrchSpec, extensible by plugin |
+
+**Why two formats?** PipeSpec is designed for LLMs to *describe* pipelines from natural language — it's flexible, allows nulls, and tolerates structural variation. OrchSpec is designed for machines to *execute* pipelines — it's strict, deterministic, and validated with 13 semantic rules. The compiler bridges them with a guaranteed byte-identical transformation.
 
 ---
 
 ## Table of Contents
 
+- [The Pipeline: PipeSpec → OrchSpec → Orchestrator](#the-pipeline-pipespec--orchspec--orchestrator)
 - [Quick Start](#quick-start)
 - [Core Components](#core-components)
   - [OrchSpec Schema v1.0](#orchspec-schema-v10)
@@ -15,6 +43,7 @@ OrchSpec is not tied to a single execution engine. It defines a canonical interm
   - [Validation Engine](#validation-engine)
   - [Semantic Diff](#semantic-diff)
   - [Adapter Framework](#adapter-framework)
+- [Formal Specification](#formal-specification)
 - [Schema Extensibility](#schema-extensibility)
 - [Adding a New Orchestrator Adapter](#adding-a-new-orchestrator-adapter)
 - [Extending the Schema](#extending-the-schema)
@@ -163,6 +192,23 @@ class OrchspecAdapter(Protocol):
 ```
 
 See [Adding a New Orchestrator Adapter](#adding-a-new-orchestrator-adapter) for a step-by-step guide.
+
+---
+
+## Formal Specification
+
+The complete OrchSpec v1.0 specification is at **[`spec/orchspec-spec-v1.md`](spec/orchspec-spec-v1.md)**. It covers:
+
+- The [PipeSpec → OrchSpec → Orchestrator](spec/orchspec-spec-v1.md#1-positioning-pipespec--orchspec--orchestrator) pipeline lifecycle
+- [Document model](spec/orchspec-spec-v1.md#3-document-model) with full field definitions
+- [Execution semantics](spec/orchspec-spec-v1.md#4-execution-semantics) for all flow patterns (sequential, parallel, DAG, conditional, loop)
+- [Validation model](spec/orchspec-spec-v1.md#5-validation-model) with all 13 semantic rules (SEM001–SEM013)
+- [Determinism guarantee](spec/orchspec-spec-v1.md#6-determinism-guarantee) and canonical ordering rules
+- [Compilation contract](spec/orchspec-spec-v1.md#7-compilation-contract) with PipeSpec field mapping
+- [Projection model](spec/orchspec-spec-v1.md#8-projection-model) and adapter protocol
+- [Schema extensibility](spec/orchspec-spec-v1.md#9-schema-extensibility) patterns
+- [Versioning & compatibility](spec/orchspec-spec-v1.md#10-versioning--compatibility) guarantees
+- [Security considerations](spec/orchspec-spec-v1.md#11-security-considerations)
 
 ---
 
