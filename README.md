@@ -1,6 +1,6 @@
 # OrchSpec
 
-**Open Pipeline Orchestration Specification** — a platform-agnostic pipeline abstraction standard with a deterministic compiler, multi-layered validator, semantic diff engine, and an extensible adapter framework for projecting pipelines onto any orchestrator.
+**Orchestration Specification** — a platform-agnostic pipeline abstraction standard with a deterministic compiler, multi-layered validator, semantic diff engine, and an extensible adapter framework for projecting pipelines onto any orchestrator.
 
 OrchSpec is not tied to a single execution engine. It defines a canonical intermediate representation (IR) that can be consumed, validated, diffed, and projected to imperative or declarative orchestrators through pluggable adapters.
 

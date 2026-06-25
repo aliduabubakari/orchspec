@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.1.0 - 2026-06-25
-- Rebranded from OPOS to OrchSpec with full namespace migration
+- Initial OrchSpec release: full namespace, compiler, validator, diff, and adapter framework
 - Renamed package to `orchspec` (PyPI)
 - Extensively documented schema extensibility patterns and adapter framework
 - 7 documented extension points: custom executors, categories, integrations, labels/tags, adapters, schema $ref overrides, OTS export
