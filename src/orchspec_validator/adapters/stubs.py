@@ -53,6 +53,31 @@ class AirflowAdapter(_BaseStubAdapter):
     def __init__(self) -> None:
         super().__init__(target_name="airflow", runtime_style="imperative")
 
+    def validate_invariants(self, orchspec_doc: dict) -> list[str]:
+        violations = super().validate_invariants(orchspec_doc)
+        for idx, comp in enumerate(orchspec_doc.get("components", [])):
+            exec_type = (comp.get("executor") or {}).get("type")
+            if exec_type == "sql":
+                violations.append(
+                    f"component[{idx}] '{comp.get('id')}': SQL executor requires "
+                    f"apache-airflow-providers-common-sql package"
+                )
+            if exec_type == "container":
+                image = comp.get("image_override") or (comp.get("executor") or {}).get("image")
+                if not image:
+                    violations.append(
+                        f"component[{idx}] '{comp.get('id')}': container executor "
+                        f"requires an image (set image_override or executor.image)"
+                    )
+        return violations
+
+    def project(self, orchspec_doc: dict) -> ProjectionResult:
+        from orchspec_validator.adapters.airflow_projector import project_to_airflow
+        violations = self.validate_invariants(orchspec_doc)
+        if violations:
+            raise ValueError(f"Cannot project to {self.target_name}: {', '.join(violations)}")
+        return project_to_airflow(orchspec_doc)
+
 
 class PrefectAdapter(_BaseStubAdapter):
     def __init__(self) -> None:

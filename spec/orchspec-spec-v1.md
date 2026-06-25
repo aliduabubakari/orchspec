@@ -518,15 +518,15 @@ The `project()` method transforms an OrchSpec document into a target-specific in
 
 ### 8.5 Built-in Adapters
 
-| Adapter | Target | Style |
-|---------|--------|-------|
-| AirflowAdapter | Apache Airflow 2.x | imperative |
-| PrefectAdapter | Prefect 2.x/3.x | imperative |
-| DagsterAdapter | Dagster | imperative |
-| KestraAdapter | Kestra | declarative |
-| ArgoAdapter | Argo Workflows | declarative |
-| KubeflowAdapter | Kubeflow Pipelines | declarative |
-| FlyteAdapter | Flyte | declarative |
+| Adapter | Target | Style | Projection |
+|---------|--------|-------|------------|
+| AirflowAdapter | Apache Airflow 2.x | imperative | **Real** — emits valid DAG Python source via TaskFlow API |
+| PrefectAdapter | Prefect 2.x/3.x | imperative | Stub IR (placeholder) |
+| DagsterAdapter | Dagster | imperative | Stub IR (placeholder) |
+| KestraAdapter | Kestra | declarative | Stub IR (placeholder) |
+| ArgoAdapter | Argo Workflows | declarative | Stub IR (placeholder) |
+| KubeflowAdapter | Kubeflow Pipelines | declarative | Stub IR (placeholder) |
+| FlyteAdapter | Flyte | declarative | Stub IR (placeholder) |
 
 ---
 

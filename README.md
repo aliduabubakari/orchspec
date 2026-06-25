@@ -180,15 +180,15 @@ OrchSpec's adapter framework enables **projecting** an OrchSpec document onto an
 
 **Built-in stub adapters:**
 
-| Adapter | Target | Runtime Style |
-|---------|--------|---------------|
-| `AirflowAdapter` | Apache Airflow | imperative |
-| `PrefectAdapter` | Prefect | imperative |
-| `DagsterAdapter` | Dagster | imperative |
-| `KestraAdapter` | Kestra | declarative |
-| `ArgoAdapter` | Argo Workflows | declarative |
-| `KubeflowAdapter` | Kubeflow Pipelines | declarative |
-| `FlyteAdapter` | Flyte | declarative |
+| Adapter | Target | Runtime Style | Projection |
+|---------|--------|---------------|------------|
+| `AirflowAdapter` | Apache Airflow 2.x | imperative | **Real** — emits valid DAG Python |
+| `PrefectAdapter` | Prefect 2.x/3.x | imperative | Stub IR |
+| `DagsterAdapter` | Dagster | imperative | Stub IR |
+| `KestraAdapter` | Kestra | declarative | Stub IR |
+| `ArgoAdapter` | Argo Workflows | declarative | Stub IR |
+| `KubeflowAdapter` | Kubeflow Pipelines | declarative | Stub IR |
+| `FlyteAdapter` | Flyte | declarative | Stub IR |
 
 Each adapter implements the [`OrchspecAdapter` Protocol](src/orchspec_validator/adapters/interface.py):
 
