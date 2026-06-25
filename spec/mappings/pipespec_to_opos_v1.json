@@ -8,6 +8,7 @@
     "sql": "sql",
     "http": "http_request",
     "container": "container",
+    "docker": "container",
     "email": "email",
     "custom": "custom"
   },

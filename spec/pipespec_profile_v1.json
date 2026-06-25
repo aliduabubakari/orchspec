@@ -31,6 +31,8 @@
       "properties": {
         "name": {"type": "string"},
         "description": {"type": "string"},
+        "flow_patterns": {"type": "array", "items": {"type": "string"}},
+        "task_executors": {"type": "array", "items": {"type": "string"}},
         "complexity": {"type": "string", "enum": ["low", "medium", "high"]}
       }
     },
@@ -93,6 +95,14 @@
                 "purpose": {"type": ["string", "null"]}
               }
             }
+          },
+          "concurrency": {
+            "type": ["object", "null"],
+            "additionalProperties": true
+          },
+          "datasets": {
+            "type": ["object", "null"],
+            "additionalProperties": true
           }
         }
       }
@@ -103,6 +113,7 @@
       "properties": {
         "pattern": {"type": "string"},
         "entry_points": {"type": "array", "items": {"type": "string"}},
+        "nodes": {"type": "object", "additionalProperties": true},
         "edges": {
           "type": "array",
           "items": {
@@ -112,7 +123,8 @@
               "from": {"type": "string"},
               "to": {"type": "string"},
               "edge_type": {"type": "string"},
-              "condition": {"type": ["string", "null"]}
+              "condition": {"type": ["string", "null"]},
+              "metadata": {"type": ["object", "null"], "additionalProperties": true}
             }
           }
         }
@@ -125,6 +137,7 @@
       "properties": {
         "pipeline": {"type": "object", "additionalProperties": true},
         "schedule": {"type": "object", "additionalProperties": true},
+        "execution": {"type": "object", "additionalProperties": true},
         "components": {"type": "object", "additionalProperties": true},
         "environment": {"type": "object", "additionalProperties": true}
       }
@@ -147,10 +160,12 @@
               "authentication": {"type": "object", "additionalProperties": true},
               "used_by_components": {"type": "array", "items": {"type": "string"}},
               "direction": {"type": "string"},
-              "rate_limit": {"type": ["string", "null"]}
+              "rate_limit": {"type": ["string", "null"]},
+              "datasets": {"type": ["object", "null"], "additionalProperties": true}
             }
           }
-        }
+        },
+        "data_lineage": {"type": "object", "additionalProperties": true}
       }
     }
   }

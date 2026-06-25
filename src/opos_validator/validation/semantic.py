@@ -132,13 +132,13 @@ def validate_semantics(
         errors.append(ValidationIssue("SEM009", "schedule enabled requires cron", "$.schedule"))
 
     allowed = {
-        "Extractor": {"python_script", "http_request", "container", "custom"},
+        "Extractor": {"python_script", "http_request", "container", "bash", "sql", "custom"},
         "Transformer": {"python_script", "sql", "bash", "container", "custom"},
-        "Loader": {"python_script", "sql", "container", "custom"},
+        "Loader": {"python_script", "sql", "container", "bash", "http_request", "custom"},
         "QualityCheck": {"python_script", "sql", "bash", "custom"},
-        "Notifier": {"email", "http_request", "custom"},
+        "Notifier": {"email", "http_request", "python_script", "custom"},
         "Sensor": {"http_request", "python_script", "custom"},
-        "Reconciliator": {"python_script", "sql", "custom"},
+        "Reconciliator": {"python_script", "sql", "container", "custom"},
         "Custom": {"custom", "python_script", "container", "bash", "sql", "http_request", "email"},
     }
     for idx, comp in enumerate(doc.get("components", [])):

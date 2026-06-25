@@ -78,3 +78,23 @@ def test_sem010_promoted_to_error_in_strict_mode() -> None:
 
     assert any(w.code == "SEM010" for w in non_strict.warnings)
     assert any(e.code == "SEM010" for e in strict.errors)
+
+
+def test_sem010_accepts_expanded_corpus_patterns() -> None:
+    doc = _base_doc()
+    doc["components"][1]["category"] = "Notifier"
+    doc["components"][1]["executor"] = {"type": "python_script"}
+    doc["components"][2]["executor"] = {"type": "bash"}
+    doc["components"][0]["category"] = "Reconciliator"
+    doc["components"][0]["executor"] = {"type": "container"}
+
+    report = validate_opos(doc, strict=True)
+    assert not any(e.code == "SEM010" for e in report.errors)
+
+
+def test_sem010_accepts_sql_extractor() -> None:
+    doc = _base_doc()
+    doc["components"][0]["executor"] = {"type": "sql"}
+
+    report = validate_opos(doc, strict=True)
+    assert not any(e.code == "SEM010" for e in report.errors)
