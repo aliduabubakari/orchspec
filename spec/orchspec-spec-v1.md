@@ -334,7 +334,50 @@ Semantic rules validate cross-field and inter-component integrity beyond what JS
 
 | Rule | Description | Severity |
 |------|-------------|----------|
-| SEM013 | Retry policy configuration must be internally coherent | Error |
+| SEM013 | Retry policy configuration must be internally coherent (multiplier > 1 for exponential, max_delay >= delay) | Error |
+
+#### Resource Integrity
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM014 | Resource requests (CPU, memory, GPU) must not exceed limits per component | Error |
+
+#### Security Coherence
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM015 | Security context must be internally consistent: `run_as_non_root` cannot have `run_as_user: 0`, dropped capabilities cannot also be added | Error |
+
+#### I/O & Data Flow
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM016 | No two components may write to the same output `path_pattern` | Warning |
+| SEM017 | Connected components should have compatible I/O kinds (e.g., source outputs `file`, target inputs `table` → warning) | Warning |
+
+#### Condition Expressions
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM018 | Edge condition expressions must be non-empty and have balanced parentheses/brackets | Warning |
+
+#### Integration Compatibility
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM019 | IO `kind` must be compatible with its associated integration `type` (e.g., `file` → `filesystem` or `object_store`; `table` → `database`) | Warning |
+
+#### Scheduling & Timeouts
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM020 | Component timeout must not exceed the schedule interval (component may not complete before next scheduled run) | Warning |
+
+#### Declaration Hygiene
+
+| Rule | Description | Severity |
+|------|-------------|----------|
+| SEM021 | Parameters and secrets declared at the top level should be consumed by at least one component or integration | Warning |
 
 ### 5.3 Strict Mode
 

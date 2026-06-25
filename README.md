@@ -151,6 +151,14 @@ The `pipespec2orchspec` compiler deterministically converts PipeSpec v1.0 JSON d
 | SEM011 | No unreachable components in the flow graph |
 | SEM012 | No disconnected subgraphs |
 | SEM013 | Retry policy coherence (strategy, delay, multiplier consistency) |
+| SEM014 | Resource requests must not exceed limits (CPU, memory, GPU) |
+| SEM015 | Security context coherence (non-root, capability conflicts) |
+| SEM016 | Duplicate output path conflicts across components |
+| SEM017 | Data flow I/O kind compatibility between connected components |
+| SEM018 | Condition expression syntax (non-empty, balanced parentheses) |
+| SEM019 | Integration type ↔ IO kind compatibility |
+| SEM020 | Component timeout vs schedule interval sanity |
+| SEM021 | Unused parameters and secrets declared at top level |
 
 With `--strict`, warnings (SEM010) are promoted to errors.
 
@@ -202,7 +210,7 @@ The complete OrchSpec v1.0 specification is at **[`spec/orchspec-spec-v1.md`](sp
 - The [PipeSpec → OrchSpec → Orchestrator](spec/orchspec-spec-v1.md#1-positioning-pipespec--orchspec--orchestrator) pipeline lifecycle
 - [Document model](spec/orchspec-spec-v1.md#3-document-model) with full field definitions
 - [Execution semantics](spec/orchspec-spec-v1.md#4-execution-semantics) for all flow patterns (sequential, parallel, DAG, conditional, loop)
-- [Validation model](spec/orchspec-spec-v1.md#5-validation-model) with all 13 semantic rules (SEM001–SEM013)
+- [Validation model](spec/orchspec-spec-v1.md#5-validation-model) with all 21 semantic rules (SEM001–SEM021)
 - [Determinism guarantee](spec/orchspec-spec-v1.md#6-determinism-guarantee) and canonical ordering rules
 - [Compilation contract](spec/orchspec-spec-v1.md#7-compilation-contract) with PipeSpec field mapping
 - [Projection model](spec/orchspec-spec-v1.md#8-projection-model) and adapter protocol
