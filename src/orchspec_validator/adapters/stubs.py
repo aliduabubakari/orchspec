@@ -85,10 +85,26 @@ class PrefectAdapter(_BaseStubAdapter):
     def __init__(self) -> None:
         super().__init__(target_name="prefect", runtime_style="imperative")
 
+    def project(self, orchspec_doc: dict) -> ProjectionResult:
+        from orchspec_validator.adapters.prefect_projector import project_to_prefect
+        violations = self.validate_invariants(orchspec_doc)
+        critical = [v for v in violations if "missing" in v.lower()]
+        if critical:
+            raise ValueError(f"Cannot project to {self.target_name}: {', '.join(critical)}")
+        return project_to_prefect(orchspec_doc)
+
 
 class DagsterAdapter(_BaseStubAdapter):
     def __init__(self) -> None:
         super().__init__(target_name="dagster", runtime_style="imperative")
+
+    def project(self, orchspec_doc: dict) -> ProjectionResult:
+        from orchspec_validator.adapters.dagster_projector import project_to_dagster
+        violations = self.validate_invariants(orchspec_doc)
+        critical = [v for v in violations if "missing" in v.lower()]
+        if critical:
+            raise ValueError(f"Cannot project to {self.target_name}: {', '.join(critical)}")
+        return project_to_dagster(orchspec_doc)
 
 
 class KestraAdapter(_BaseStubAdapter):
@@ -99,6 +115,14 @@ class KestraAdapter(_BaseStubAdapter):
 class ArgoAdapter(_BaseStubAdapter):
     def __init__(self) -> None:
         super().__init__(target_name="argo", runtime_style="declarative")
+
+    def project(self, orchspec_doc: dict) -> ProjectionResult:
+        from orchspec_validator.adapters.argo_projector import project_to_argo
+        violations = self.validate_invariants(orchspec_doc)
+        critical = [v for v in violations if "missing" in v.lower()]
+        if critical:
+            raise ValueError(f"Cannot project to {self.target_name}: {', '.join(critical)}")
+        return project_to_argo(orchspec_doc)
 
 
 class KubeflowAdapter(_BaseStubAdapter):

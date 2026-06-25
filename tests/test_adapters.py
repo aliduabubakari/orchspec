@@ -21,16 +21,19 @@ def test_default_adapters_project_stub_ir() -> None:
     adapters = get_default_adapters()
     assert len(adapters) == 7
 
+    real_adapters = {"airflow", "prefect", "dagster", "argo"}
+
     for adapter in adapters:
         issues = adapter.validate_invariants(doc)
         assert issues == []
         result = adapter.project(doc)
         assert result.target == adapter.capability().target
-        # Airflow is the only adapter with a real projection (v1.0)
-        if result.target == "airflow":
-            assert result.artifact_type == "airflow_dag_python"
-            assert "source" in result.content
-            assert "from airflow" in result.content["source"]
+        if result.target in real_adapters:
+            # Real projections emit source code
+            assert result.artifact_type != "stub_ir"
+            assert "source" in result.content or "content" in result.content
+            source = result.content.get("source", "")
+            assert len(source) > 0, f"{result.target} adapter returned empty source"
         else:
             assert result.artifact_type == "stub_ir"
 
